@@ -12,6 +12,7 @@ const Content = () => {
     const [videos, setVideos] = useState([]); 
     
     const getVideosWithLikes = async () => {
+        if (!videreContract) return; // Ensure videreContract is not null
         try {
             let videoList = [];
             let numOfVideos = await videreContract.getNumbers();
@@ -45,16 +46,21 @@ const Content = () => {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const videreContract = new ethers.Contract(
-            contractAddress,
-            contractABI,
-            signer
+                contractAddress,
+                contractABI,
+                signer
             );
             setVidereContract(videreContract);
-            getVideosWithLikes(); // Get videos with likes info after setting up the contract
         };
-    
+
         initEthereum();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (videreContract) {
+            getVideosWithLikes();
+        }
+    }, [videreContract]);
 
     const likeVideo = async (_id) => {
         try {
@@ -66,24 +72,6 @@ const Content = () => {
             alert("Error with liking video : ", error)
         }
     }
-
-    useEffect(() => {
-        const initEthereum = async () => {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const videreContract = new ethers.Contract(
-            contractAddress,
-            contractABI,
-            signer
-          );
-          setVidereContract(videreContract);
-        };
-    
-        initEthereum();
-
-        
-        
-    }, []);
 
     return (
         <div className='flex flex-col items-center justify-center mt-10'>
